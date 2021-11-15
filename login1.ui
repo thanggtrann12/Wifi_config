@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>575</width>
-    <height>689</height>
+    <height>684</height>
    </rect>
   </property>
   <property name="focusPolicy">
@@ -235,9 +235,9 @@ background-color: rgb(0255, 255, 255);</string>
    <widget class="QPushButton" name="Storedwifi">
     <property name="geometry">
      <rect>
-      <x>50</x>
+      <x>20</x>
       <y>440</y>
-      <width>141</width>
+      <width>101</width>
       <height>31</height>
      </rect>
     </property>
@@ -289,6 +289,19 @@ background-color: rgb(0255, 255, 255);</string>
       <width>256</width>
       <height>192</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="selectwifi">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>440</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Select wifi</string>
     </property>
    </widget>
   </widget>

@@ -19,6 +19,7 @@ class UI(QtWidgets.QMainWindow):
         self.Storedwifi = self.findChild(QtWidgets.QPushButton, 'Storedwifi')
         self.Led = self.findChild(QtWidgets.QLabel, 'Connectled')
         self.wifistatus = self.findChild(QtWidgets.QListWidget, 'Wifistatus')
+        self.SelectedWifi = self.findChild(QtWidgets.QPushButton,'selectwifi')
         self.Pushwifi.clicked.connect(self.Push_wifi)
         self.Getwifi.clicked.connect(self.Get_wifi)
         self.Storedwifi.clicked.connect(self.Stored_wifi)
@@ -66,6 +67,14 @@ class UI(QtWidgets.QMainWindow):
         #         self.statu.setText(i)
         for x, y in zip(storedwifi.SSID, storedwifi.PASS):
             self.Stored.addItem(str(x)+' ' + str(*y))
+        
+        self.SelectedWifi.clicked.connect(self.add_wifi)
+    def add_wifi(self):
+        ssid= storedwifi.SSID[self.Stored.currentRow()]
+        passw =storedwifi.PASS[self.Stored.currentRow()]
+        self.Getpass.setText(*passw)
+        self.Getssid.setText(ssid)
+        
 
     def wifi_log(self):
         import subprocess

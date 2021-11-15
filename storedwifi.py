@@ -15,5 +15,3 @@ for i in profiles:
         
     except IndexError:
         pass
-for x,y in zip(SSID,PASS):
-    print(x,' ', *y)

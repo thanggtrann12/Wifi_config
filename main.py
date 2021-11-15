@@ -62,9 +62,6 @@ class UI(QtWidgets.QMainWindow):
         print(self.Getssid.text())
 
     def Stored_wifi(self):
-        # for i in storedwifi.SSID:
-        #     if self.Getssid.text() ==  i:
-        #         self.statu.setText(i)
         for x, y in zip(storedwifi.SSID, storedwifi.PASS):
             self.Stored.addItem(str(x)+' ' + str(*y))
         
@@ -80,9 +77,16 @@ class UI(QtWidgets.QMainWindow):
         import subprocess
         wifi = subprocess.check_output(['netsh', 'WLAN', 'show', 'interfaces'])
         data = wifi.decode('utf-8')
+        
+        for wifiname in storedwifi.SSID:
+            
+            if wifiname in data:
+                print(wifiname)          
         self.wifistatus.addItem(data)
 
 
+
+        
 app = QtWidgets.QApplication(sys.argv)
 window = UI()
 app.exec_()

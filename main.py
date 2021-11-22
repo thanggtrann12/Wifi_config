@@ -1,13 +1,18 @@
+from ctypes import sizeof
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 import sys
-import checkconnect
-import storedwifi
+from Resource import checkconnect, storedwifi
+import struct
+import time
+from array import array
+from Resource import PushAndGet
+
 
 
 class UI(QtWidgets.QMainWindow):
     def __init__(self):
         super(UI, self).__init__()
-        uic.loadUi("login1.ui", self)
+        uic.loadUi("Gui/MainWindow.ui", self)
         self.Getssid = self.findChild(QtWidgets.QLineEdit, 'SSID')
         self.Getpass = self.findChild(QtWidgets.QLineEdit, 'PASS')
         self.Getport = self.findChild(QtWidgets.QComboBox, 'Port')
@@ -35,22 +40,29 @@ class UI(QtWidgets.QMainWindow):
             port = str(i).split(" ")[0]
             self.Getport.addItem(port)
         self.show()
-
+        
     def Push_wifi(self):
-        if self.Getssid.text() == '' or self.Getpass == '':
+        TK= self.Getssid.text()
+        MK = self.Getpass.text()
+        if self.Getssid.text() == '' or self.Getpass.text() == '':
             msg = QtWidgets.QMessageBox()
             msg.setIcon(QtWidgets.QMessageBox.Information)
             msg.setText("Error")
             msg.setInformativeText("SSID or PASS is empty")
             msg.setWindowTitle("Alert")
             msg.exec_()
+        
         if checkconnect.flag == True:
             self.Led.setStyleSheet('\nbackground-color: rgb(0, 255, 0);')
             self.status.setText("Connected")
         else:
             self.Led.setStyleSheet('\nbackground-color: rgb(255, 0q, 0);')
             self.status.setText("Disconnected")
-
+        import serial
+        # info = [storedwifi.SSID[self.Stored.currentRow()],*(storedwifi.PASS[self.Stored.currentRow()])]
+        PushAndGet.Tranfer.lenR
+        
+        
     def Get_wifi(self):
         if self.Getssid.text() == '':
             msg = QtWidgets.QMessageBox()

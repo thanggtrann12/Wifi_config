@@ -5,7 +5,7 @@ from Resource import checkconnect, storedwifi
 import struct
 import time
 from array import array
-
+from Resource.PushAndGet import *
 
 class UI(QtWidgets.QMainWindow):
     def __init__(self):
@@ -38,10 +38,9 @@ class UI(QtWidgets.QMainWindow):
             port = str(i).split(" ")[0]
             self.Getport.addItem(port)
         self.show()
-        
+
     def Push_wifi(self):
-        TK= self.Getssid.text()
-        MK = self.Getpass.text()
+
         if self.Getssid.text() == '' or self.Getpass.text() == '':
             msg = QtWidgets.QMessageBox()
             msg.setIcon(QtWidgets.QMessageBox.Information)
@@ -56,21 +55,13 @@ class UI(QtWidgets.QMainWindow):
         else:
             self.Led.setStyleSheet('\nbackground-color: rgb(255, 0q, 0);')
             self.status.setText("Disconnected")
-            
-        # import serial
-        # info = [storedwifi.SSID[self.Stored.currentRow()],*(storedwifi.PASS[self.Stored.currentRow()])]
+        SSID = self.Getssid.text()
+        PASS = self.Getpass.text()
+        WifiComSetInfoWifi(SSID,PASS,self.Getport.currentText())
+
         
     def Get_wifi(self):
-       
-        if self.Getssid.text() == '':
-            msg = QtWidgets.QMessageBox()
-            msg.setIcon(QtWidgets.QMessageBox.Information)
-            msg.setText("Error")
-            msg.setInformativeText("SSID is empty")
-            msg.setWindowTitle("Alert")
-            msg.exec_()
-        print(self.Getssid.text())
-        
+        WifiComSetInfoWifi(self.Getport.currentText())
         
     def Stored_wifi(self):
         for x, y in zip(storedwifi.SSID, storedwifi.PASS):

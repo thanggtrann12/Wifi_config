@@ -2,10 +2,9 @@ from ctypes import sizeof
 import serial
 import array as arr
 import sys
-
 from serial.serialutil import Timeout 
 
-ser = serial.Serial('COM2', 115200, timeout = 0.5)
+
 
 FRAME_RQ_LENGTH_MIN = 6
 HEADER = 0x55ff
@@ -53,8 +52,8 @@ class FrameRequest_t:
 def int_to_bytes(x: int) -> bytes:
     return x.to_bytes((x.bit_length() + 7) // 8, 'big')
 
-def Tranfer(cmd, dataTx, lenTx):
-
+def Tranfer(cmd, dataTx, lenTx,portName):
+	ser = serial.Serial(portName, 115200, timeout=0.5)
 	length = lenTx + FRAME_RQ_LENGTH_MIN
 	outGoing = []
 	outGoing.append(HEADER)
@@ -101,20 +100,16 @@ def Convert(SSID,lenSSID,PASS,lenPASS):
     for i in range(len(dataResult),lenPASS+lenSSID):
         dataResult.append(0)
     return dataResult
-def WifiComGetInfoWifi():
-	SSID = 'test2'
-	PASS = '12345612zxc'
-	# tempTx= SSID+PASS
-	# dataTx=[]
-	# for i in range(0,len(tempTx)):
-	# 	dataTx.append(ord(tempTx[i]))
-	# print("dataTx: ",dataTx,"len dataTx: ",len(dataTx))
-	dataTx = Convert(SSID,32,PASS,64)
-	Tranfer(0x02, dataTx ,len(dataTx))
-	# Tranfer(0x03,[],0)
+def WifiComSetInfoWifi(SSID,PASS,portName):
 
-if __name__ == '__main__':
-	WifiComGetInfoWifi()
+	dataTx = Convert(SSID,32,PASS,64)
+	Tranfer(0x02, dataTx ,len(dataTx),portName)
+
+def WifiComGetInfoWifi(portName):
+	if serial.Serial(portName,115200,timeout=0.5).isOpen():
+		Tranfer(0x03,[],0,portName)
+	else:
+		print("Port busy ")
 
 
 

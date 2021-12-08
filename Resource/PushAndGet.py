@@ -85,16 +85,34 @@ def Tranfer(cmd, dataTx, lenTx):
 	bufR = ser.read(50)
 	print("Buff Write: ",bufW)
 	print("Buff Read:",bufR)
+
+def Convert(SSID,lenSSID,PASS,lenPASS):
+    converSSID=[]
+    converPASS=[]
+    converSSID[:0]=SSID
+    converPASS[:0]=PASS
+    dataResult =[]
+    for i in range(0,len(converSSID)):
+       dataResult.append(ord(converSSID[i]))
+    for i in range(len(dataResult),lenSSID):
+        dataResult.append(0)
+    for i in range(0, len(converPASS)):
+        dataResult.append(ord(converPASS[i]))
+    for i in range(len(dataResult),lenPASS+lenSSID):
+        dataResult.append(0)
+    return dataResult
 def WifiComGetInfoWifi():
-	SSID = 'testcase_2'
+	SSID = 'test2'
 	PASS = '12345612zxc'
-	tempTx= SSID+PASS
-	dataTx=[]
-	for i in range(0,len(tempTx)):
-		dataTx.append(ord(tempTx[i]))
-	print("dataTx: ",dataTx,"len dataTx: ",len(dataTx))
+	# tempTx= SSID+PASS
+	# dataTx=[]
+	# for i in range(0,len(tempTx)):
+	# 	dataTx.append(ord(tempTx[i]))
+	# print("dataTx: ",dataTx,"len dataTx: ",len(dataTx))
+	dataTx = Convert(SSID,32,PASS,64)
 	Tranfer(0x02, dataTx ,len(dataTx))
 	# Tranfer(0x03,[],0)
+
 if __name__ == '__main__':
 	WifiComGetInfoWifi()
 

@@ -106,10 +106,8 @@ def WifiComSetInfoWifi(SSID,PASS,portName):
 	Tranfer(0x02, dataTx ,len(dataTx),portName)
 
 def WifiComGetInfoWifi(portName):
-	if serial.Serial(portName,115200,timeout=0.5).isOpen():
-		Tranfer(0x03,[],0,portName)
-	else:
-		print("Port busy ")
+
+	Tranfer(0x03, [], 0, portName)
 
 
 

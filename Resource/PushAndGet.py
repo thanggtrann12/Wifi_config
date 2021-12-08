@@ -1,12 +1,14 @@
+from ctypes import sizeof
 import serial
 import array as arr
+import sys
 
 from serial.serialutil import Timeout 
-from main import *
-ser = serial.Serial('COM7', 115200, timeout = 0.5)
+
+ser = serial.Serial('COM2', 115200, timeout = 0.5)
 
 FRAME_RQ_LENGTH_MIN = 6
-HEADER = 0x55FF
+HEADER = 0x55ff
 SIZE_HEADER = 2
 SIZE_LENGTH = 2
 
@@ -54,13 +56,13 @@ def int_to_bytes(x: int) -> bytes:
 def Tranfer(cmd, dataTx, lenTx):
 
 	length = lenTx + FRAME_RQ_LENGTH_MIN
-
 	outGoing = []
 	outGoing.append(HEADER)
 	outGoing.append(length)
 	outGoing.append(cmd)
 	for i in range(0, len(dataTx)):
 		outGoing.append(dataTx[i])
+	print("outGoing : ", outGoing)
 
 
 
@@ -79,55 +81,22 @@ def Tranfer(cmd, dataTx, lenTx):
 
 	crc = Crc8(bufW, len(bufW))
 	bufW += crc.to_bytes(1,byteorder="little")
-	
 	ser.write(bufW)
 	bufR = ser.read(50)
 	print("Buff Write: ",bufW)
 	print("Buff Read:",bufR)
-	data = str(bufR)
-	headerR=''
-	lenR =''
-	cmdR=''
-	dataR=''
-	import binascii
-	for i in range(4,len(data)):
-		if data[i] != "\\":
-			headerR = headerR + data[i]
-		else: 
-			break
-	if headerR != None:
-		for i in range(len(headerR)+5,len(data)):
-			if data[i] != "\\":
-				lenR = lenR + data[i]
-			else:
-				break
-		for i in range(len(lenR)+len(headerR)+6,len(data)):
-			if data[i] != "\\":
-				cmdR = cmdR + data[i]
-			else:
-				break
-		for i in range(len(cmdR)+len(lenR)+len(headerR)+7,len(data)):
-			if data[i] == "\\":
-				continue
-			else:
-				dataR = dataR + data[i]
-		
-	dataR=dataR.split('x00')
-	temp = []
-	for i in range(0,len(dataR)):
-		if dataR[i] != '':
-			print(dataR[i])
-			temp.append(dataR[i])
-	
-	print("headerR : ",headerR)
-	print("lenR : ",lenR)
-	print("cmdR : ",cmdR)
-
 def WifiComGetInfoWifi():
-
-	Tranfer(0x03, [], 0)
-
-
+	SSID = 'testcase_2'
+	PASS = '12345612zxc'
+	tempTx= SSID+PASS
+	dataTx=[]
+	for i in range(0,len(tempTx)):
+		dataTx.append(ord(tempTx[i]))
+	print("dataTx: ",dataTx,"len dataTx: ",len(dataTx))
+	Tranfer(0x02, dataTx ,len(dataTx))
+	# Tranfer(0x03,[],0)
+if __name__ == '__main__':
+	WifiComGetInfoWifi()
 
 
 

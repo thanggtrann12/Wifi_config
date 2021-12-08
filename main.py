@@ -5,8 +5,6 @@ from Resource import checkconnect, storedwifi
 import struct
 import time
 from array import array
-from Resource import PushAndGet
-
 
 
 class UI(QtWidgets.QMainWindow):
@@ -58,12 +56,12 @@ class UI(QtWidgets.QMainWindow):
         else:
             self.Led.setStyleSheet('\nbackground-color: rgb(255, 0q, 0);')
             self.status.setText("Disconnected")
-        import serial
+            
+        # import serial
         # info = [storedwifi.SSID[self.Stored.currentRow()],*(storedwifi.PASS[self.Stored.currentRow()])]
-        PushAndGet.Tranfer.lenR
-        
         
     def Get_wifi(self):
+       
         if self.Getssid.text() == '':
             msg = QtWidgets.QMessageBox()
             msg.setIcon(QtWidgets.QMessageBox.Information)
@@ -72,7 +70,8 @@ class UI(QtWidgets.QMainWindow):
             msg.setWindowTitle("Alert")
             msg.exec_()
         print(self.Getssid.text())
-
+        
+        
     def Stored_wifi(self):
         for x, y in zip(storedwifi.SSID, storedwifi.PASS):
             self.Stored.addItem(str(x)+' ' + str(*y))
@@ -96,6 +95,9 @@ class UI(QtWidgets.QMainWindow):
                 print(wifiname)          
         self.wifistatus.addItem(data)
 
+
+
+    
 
 
         

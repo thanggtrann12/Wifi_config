@@ -1,12 +1,12 @@
 from ctypes import sizeof
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 import sys
-from Resource import checkconnect, storedwifi
+from Resource import storedwifi
 import struct
 import time
 from array import array
 from Resource.PushAndGet import *
-from Resource.test import portIsUsable
+
 
 class UI(QtWidgets.QMainWindow):
     def __init__(self):
@@ -27,20 +27,34 @@ class UI(QtWidgets.QMainWindow):
         self.Pushwifi.clicked.connect(self.Push_wifi)
         self.Getwifi.clicked.connect(self.Get_wifi)
         self.Storedwifi.clicked.connect(self.Stored_wifi)
-        if checkconnect.flag == True:
-            self.Led.setStyleSheet('\nbackground-color: rgb(0, 255, 0);')
-            self.status.setText("Connected")
-        else:
-            self.Led.setStyleSheet('\nbackground-color: rgb(255, 0q, 0);')
-            self.status.setText("Disconnected")
         self.Getstt.clicked.connect(self.wifi_log)
         import serial.tools.list_ports
         for i in serial.tools.list_ports.comports():
             port = str(i).split(" ")[0]
             self.Getport.addItem(port)
         self.show()
+        portName = self.Getport.currentText()
+        try:
+            ser = serial.Serial(port=portName)
+            self.Led.setStyleSheet('\nbackground-color: rgb(0, 255, 0);')
+            self.status.setText("Connected")
+
+        except:
+            self.Led.setStyleSheet('\nbackground-color: rgb(255, 0q, 0);')
+            self.status.setText("Disconnected")
 
     def Push_wifi(self):
+        def portIsUsable(portName):
+            try:
+                ser = serial.Serial(port=portName)
+                self.Led.setStyleSheet('\nbackground-color: rgb(0, 255, 0);')
+                self.status.setText("Connected")
+                return True
+            except:
+                self.Led.setStyleSheet('\nbackground-color: rgb(255, 0q, 0);')
+                self.status.setText("Disconnected")
+                return False
+
 
         if self.Getssid.text() == '' or self.Getpass.text() == '':
             msg = QtWidgets.QMessageBox()
@@ -49,30 +63,42 @@ class UI(QtWidgets.QMainWindow):
             msg.setInformativeText("SSID or PASS is empty")
             msg.setWindowTitle("Alert")
             msg.exec_()
-        
-        if checkconnect.flag == True:
-            self.Led.setStyleSheet('\nbackground-color: rgb(0, 255, 0);')
-            self.status.setText("Connected")
-        else:
-            self.Led.setStyleSheet('\nbackground-color: rgb(255, 0q, 0);')
-            self.status.setText("Disconnected")
+            self.wifistatus.addItem('Transmit Failed !')
+        portName = self.Getport.currentText()
         SSID = self.Getssid.text()
         PASS = self.Getpass.text()
-        if portIsUsable(self.Getport.currentText()):
-            WifiComSetInfoWifi(SSID,PASS,self.Getport.currentText())
+        if portIsUsable(portName):
+            WifiComSetInfoWifi(SSID,PASS,portName)
+            ser = serial.Serial(portName, 115200, timeout=0.5)
+            bufR = ser.read(103)
         else:
             msg.setText("Error")
             msg.setInformativeText("Port busy")
             msg.setWindowTitle("Alert")
             msg.exec_()
-
+            self.wifistatus.addItem('Transmit Failed !')
         
+        print(bufR)
+        if str(bufR) == str(b'\xffU\x07\x00\x02\x00\x06'):
+
+            self.wifistatus.addItem('Transmit Successed !')
+        else: 
+            self.wifistatus.addItem('Transmit Failed !')
     def Get_wifi(self):
+        def portIsUsable(portName):
+            try:
+                ser = serial.Serial(port=portName)
+                return True
+            except:
+                return False
         portName = self.Getport.currentText()
         if portIsUsable(portName):
-            dataFrame = WifiComGetInfoWifi(portName)
-            self.Getpass.setText(*dataFrame[5])
-            self.Getssid.setText(dataFrame[4])
+            WifiComGetInfoWifi(portName)
+            frame=dataFrame(portName)
+            print(frame)
+            
+            self.Getpass.setText(frame[5])
+            self.Getssid.setText(frame[4])
         else:
             msg = QtWidgets.QMessageBox()
             msg.setIcon(QtWidgets.QMessageBox.Information)
@@ -80,6 +106,7 @@ class UI(QtWidgets.QMainWindow):
             msg.setInformativeText("Port busy")
             msg.setWindowTitle("Alert")
             msg.exec_()
+            self.wifistatus.addItem('Transmit Failed !')
 
         
         
@@ -93,23 +120,12 @@ class UI(QtWidgets.QMainWindow):
         passw =storedwifi.PASS[self.Stored.currentRow()]
         self.Getpass.setText(*passw)
         self.Getssid.setText(ssid)
-    def portIsUsable(portName):
-        try:
-            ser = serial.Serial(port=portName)
-            return True
-        except:
-            return False
+    
 
     def wifi_log(self):
-        import subprocess
-        wifi = subprocess.check_output(['netsh', 'WLAN', 'show', 'interfaces'])
-        data = wifi.decode('utf-8')
+        portName = self.Getport.currentText()
+        WifiComGetStatusWifi(portName)
         
-        for wifiname in storedwifi.SSID:
-            
-            if wifiname in data:
-                print(wifiname)          
-        self.wifistatus.addItem(data)
 
 
     

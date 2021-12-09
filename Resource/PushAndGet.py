@@ -2,7 +2,8 @@ from ctypes import sizeof
 import serial
 import array as arr
 import sys
-from serial.serialutil import Timeout 
+from serial.serialutil import Timeout
+from serial.tools.list_ports import main 
 
 
 
@@ -10,7 +11,7 @@ FRAME_RQ_LENGTH_MIN = 6
 HEADER = 0x55ff
 SIZE_HEADER = 2
 SIZE_LENGTH = 2
-
+frame = []
 def Crc8(data, size):
 	tableCrc8 = [
 	0x00, 0x5e, 0xbc, 0xe2, 0x61, 0x3f, 0xdd, 0x83, 0xc2, 0x9c, 0x7e, 0x20, 0xa3, 0xfd, 0x1f, 0x41,
@@ -81,23 +82,23 @@ def Tranfer(cmd, dataTx, lenTx,portName):
 	crc = Crc8(bufW, len(bufW))
 	bufW += crc.to_bytes(1,byteorder="little")
 	ser.write(bufW)
-	bufR = ser.read(103)
+	
 	print("Buff Write: ",bufW)
-	print("Buff Read:",bufR)
-	if cmd == 3:
-		dataFrame(bufR)
-def dataFrame(data):
+	
+def dataFrame(portName):
+	ser = serial.Serial(portName, 115200, timeout=0.5)
+	data = str(ser.read(103))
 	headerR = ''
 	lenR = ''
 	cmdR = ''
 	ackR = ''
 	dataR = ''
-	frame = []
 	for i in range(4, len(data)):
 		if data[i] != "\\":
 			headerR = headerR + data[i]
 		else:
 			frame.append(headerR)
+			
 			break
 	if headerR != None:
 		for i in range(len(headerR) + 5, len(data)):
@@ -155,7 +156,11 @@ def WifiComSetInfoWifi(SSID,PASS,portName):
 
 def WifiComGetInfoWifi(portName):
 	Tranfer(0x03, [], 0, portName)
+	
+
 def WifiComGetStatusWifi(portName):
+
 	Tranfer(0x01, [], 0, portName)
 
+	
 

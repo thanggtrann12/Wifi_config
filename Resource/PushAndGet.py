@@ -115,6 +115,7 @@ def dataFrame(data):
 		for i in range(len(lenR) + len(headerR) + 10, len(lenR) + len(headerR) + 13):
 			ackR = ackR + data[i]
 		frame.append(ackR)
+		ackR=''
 		for i in range(len(cmdR) + len(lenR) + len(headerR) + 10, len(data)):
 			if data[i] == "\\":
 				continue

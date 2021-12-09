@@ -81,10 +81,57 @@ def Tranfer(cmd, dataTx, lenTx,portName):
 	crc = Crc8(bufW, len(bufW))
 	bufW += crc.to_bytes(1,byteorder="little")
 	ser.write(bufW)
-	bufR = ser.read(50)
+	bufR = ser.read(103)
 	print("Buff Write: ",bufW)
 	print("Buff Read:",bufR)
+	if cmd == 3:
+		dataFrame(bufR)
+def dataFrame(data):
+	headerR = ''
+	lenR = ''
+	cmdR = ''
+	ackR = ''
+	dataR = ''
+	frame = []
+	for i in range(4, len(data)):
+		if data[i] != "\\":
+			headerR = headerR + data[i]
+		else:
+			frame.append(headerR)
+			break
+	if headerR != None:
+		for i in range(len(headerR) + 5, len(data)):
+			if data[i] != "\\":
+				lenR = lenR + data[i]
+			else:
+				frame.append(lenR)
+				break
+		for i in range(len(lenR) + len(headerR) + 6, len(data)):
+			if data[i] != "\\":
+				cmdR = cmdR + data[i]
+			else:
+				frame.append(cmdR)
+				break
+		for i in range(len(lenR) + len(headerR) + 10, len(lenR) + len(headerR) + 13):
+			ackR = ackR + data[i]
+		frame.append(ackR)
+		for i in range(len(cmdR) + len(lenR) + len(headerR) + 10, len(data)):
+			if data[i] == "\\":
+				continue
+			else:
+				dataR = dataR + data[i]
 
+	dataR = dataR.split('x00')
+	temp = []
+	for i in range(0, len(dataR)):
+		if dataR[i] != '':
+			temp.append(dataR[i])
+	frame.append(temp[0])
+	frame.append(temp[1])
+	return frame
+	
+
+	
 def Convert(SSID,lenSSID,PASS,lenPASS):
     converSSID=[]
     converPASS=[]
@@ -106,8 +153,8 @@ def WifiComSetInfoWifi(SSID,PASS,portName):
 	Tranfer(0x02, dataTx ,len(dataTx),portName)
 
 def WifiComGetInfoWifi(portName):
-
 	Tranfer(0x03, [], 0, portName)
-
+def WifiComGetStatusWifi(portName):
+	Tranfer(0x01, [], 0, portName)
 
 

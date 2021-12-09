@@ -6,6 +6,7 @@ import struct
 import time
 from array import array
 from Resource.PushAndGet import *
+from Resource.test import portIsUsable
 
 class UI(QtWidgets.QMainWindow):
     def __init__(self):
@@ -57,11 +58,30 @@ class UI(QtWidgets.QMainWindow):
             self.status.setText("Disconnected")
         SSID = self.Getssid.text()
         PASS = self.Getpass.text()
-        WifiComSetInfoWifi(SSID,PASS,self.Getport.currentText())
+        if portIsUsable(self.Getport.currentText()):
+            WifiComSetInfoWifi(SSID,PASS,self.Getport.currentText())
+        else:
+            msg.setText("Error")
+            msg.setInformativeText("Port busy")
+            msg.setWindowTitle("Alert")
+            msg.exec_()
 
         
     def Get_wifi(self):
-        WifiComSetInfoWifi(self.Getport.currentText())
+        portName = self.Getport.currentText()
+        if portIsUsable(portName):
+            dataFrame = WifiComGetInfoWifi(portName)
+            self.Getpass.setText(*dataFrame[5])
+            self.Getssid.setText(dataFrame[4])
+        else:
+            msg = QtWidgets.QMessageBox()
+            msg.setIcon(QtWidgets.QMessageBox.Information)
+            msg.setText("Error")
+            msg.setInformativeText("Port busy")
+            msg.setWindowTitle("Alert")
+            msg.exec_()
+
+        
         
     def Stored_wifi(self):
         for x, y in zip(storedwifi.SSID, storedwifi.PASS):
@@ -73,7 +93,12 @@ class UI(QtWidgets.QMainWindow):
         passw =storedwifi.PASS[self.Stored.currentRow()]
         self.Getpass.setText(*passw)
         self.Getssid.setText(ssid)
-        
+    def portIsUsable(portName):
+        try:
+            ser = serial.Serial(port=portName)
+            return True
+        except:
+            return False
 
     def wifi_log(self):
         import subprocess
@@ -85,7 +110,6 @@ class UI(QtWidgets.QMainWindow):
             if wifiname in data:
                 print(wifiname)          
         self.wifistatus.addItem(data)
-
 
 
     

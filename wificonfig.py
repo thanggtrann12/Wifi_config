@@ -71,19 +71,27 @@ class UI(QtWidgets.QMainWindow):
             WifiComSetInfoWifi(SSID,PASS,portName)
             ser = serial.Serial(portName, 115200, timeout=0.5)
             bufR = ser.read(103)
+            print("BufR: ",bufR)
+            ser.close()
+            if str(bufR) == "200":
+
+                self.wifistatus.addItem('Transmit Successed !')
+                self.wifistatus.addItem(str(bufR))
+            else: 
+                self.wifistatus.addItem('Transmit Failed !')
         else:
+            msg = QtWidgets.QMessageBox()
+            msg.setIcon(QtWidgets.QMessageBox.Information)
             msg.setText("Error")
             msg.setInformativeText("Port busy")
             msg.setWindowTitle("Alert")
             msg.exec_()
-            self.wifistatus.addItem('Transmit Failed !')
+            self.wifistatus.addItem('Transmit Failed ! Port busy')
+            self.Push_wifi()
         
-        print(bufR)
-        if str(bufR) == str(b'\xffU\x07\x00\x02\x00\x06'):
-
-            self.wifistatus.addItem('Transmit Successed !')
-        else: 
-            self.wifistatus.addItem('Transmit Failed !')
+            
+       
+        
     def Get_wifi(self):
         def portIsUsable(portName):
             try:

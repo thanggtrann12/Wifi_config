@@ -84,7 +84,7 @@ def Tranfer(cmd, dataTx, lenTx,portName):
 	ser.write(bufW)
 	
 	print("Buff Write: ",bufW)
-	
+	ser.close()
 def dataFrame(portName):
 	ser = serial.Serial(portName, 115200, timeout=0.5)
 	data = str(ser.read(103))
